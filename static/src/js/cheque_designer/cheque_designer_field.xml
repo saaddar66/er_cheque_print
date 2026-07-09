@@ -1,0 +1,47 @@
+<templates xml:space="preserve">
+    <t t-name="er_cheque_print.ChequeDesignerField">
+        <div class="o_cheque_designer">
+            <div class="o_cheque_designer_toolbar mb-2">
+                <t t-foreach="FIELD_KEYS" t-as="key" t-key="key[0]">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1 mb-1"
+                            t-on-click="() => this.addField(key[0])">
+                        <t t-esc="key[1]"/>
+                    </button>
+                </t>
+            </div>
+            <div class="o_cheque_designer_canvas position-relative border d-block"
+                 t-ref="canvas" style="width: 100%; overflow: visible;">
+                <img t-if="imageUrl" t-att-src="imageUrl"
+                     style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:fill;"
+                     draggable="false"/>
+                <t t-foreach="records" t-as="record" t-key="record.id">
+                    <!--
+                        NOTE: no "transform: translate(-50%, -50%)" here.
+                        The chip's top-left corner is anchored at
+                        (pos_x%, pos_y%), matching exactly how the QWeb
+                        print template positions the field
+                        (position:absolute; left:#{f.pos_x}%; top:#{f.pos_y}%;
+                        with no compensating transform). Previously the chip
+                        was rendered centered on the drop point while the
+                        printed field was anchored by its top-left corner,
+                        so every printed field landed shifted down-and-right
+                        from where it was placed in the designer.
+                    -->
+                    <div class="o_cheque_designer_chip position-absolute badge bg-primary"
+                         t-att-style="'left:' + record.data.pos_x + '%; top:' + record.data.pos_y + '%; cursor: move; user-select: none;'"
+                         t-on-pointerdown="(ev) => this.onPointerDownChip(ev, record)">
+                        <t t-esc="record.data.label or record.data.field_key"/>
+                        <a href="#" class="text-white ms-1"
+                           t-on-click.prevent="() => this.removeField(record)">×</a>
+                    </div>
+                </t>
+            </div>
+            <p class="text-muted small mt-2">
+                Drag a chip onto the cheque to position it. The top-left corner of each chip
+                marks the exact point where that field's text will start printing. Use the
+                buttons above to add more fields, or the "Field List (Advanced)" tab for
+                precise numeric control.
+            </p>
+        </div>
+    </t>
+</templates>

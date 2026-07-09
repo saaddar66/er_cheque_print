@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_cheque_layout_user,cheque.layout.user,model_cheque_layout,base.group_user,1,1,1,0
+access_cheque_layout_manager,cheque.layout.manager,model_cheque_layout,account.group_account_manager,1,1,1,1
+access_cheque_layout_field_user,cheque.layout.field.user,model_cheque_layout_field,base.group_user,1,1,1,1
+access_cheque_book_user,cheque.book.user,model_cheque_book,base.group_user,1,1,1,0
+access_cheque_book_manager,cheque.book.manager,model_cheque_book,account.group_account_manager,1,1,1,1
+access_cheque_leaf_user,cheque.leaf.user,model_cheque_leaf,base.group_user,1,1,1,0
+access_cheque_leaf_manager,cheque.leaf.manager,model_cheque_leaf,account.group_account_manager,1,1,1,1
+access_cheque_print_wizard_user,cheque.print.wizard.user,model_cheque_print_wizard,base.group_user,1,1,1,1

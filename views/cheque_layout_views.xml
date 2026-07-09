@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_cheque_layout_form" model="ir.ui.view">
+        <field name="name">cheque.layout.form</field>
+        <field name="model">cheque.layout</field>
+        <field name="arch" type="xml">
+            <form string="Cheque Layout">
+                <header>
+                    <button name="action_sync_paperformat" type="object"
+                            string="Regenerate Paper Format" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="cheque_width_mm"/>
+                            <field name="cheque_height_mm"/>
+                            <field name="paperformat_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Designer">
+                            <field name="reference_image" widget="image" class="mb-3"/>
+                            <field name="field_ids" widget="cheque_designer" nolabel="1"
+                                   options="{'image_field': 'reference_image'}"/>
+                        </page>
+                        <page string="Field List (Advanced)">
+                            <field name="field_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="field_key"/>
+                                    <field name="pos_x"/>
+                                    <field name="pos_y"/>
+                                    <field name="font_size"/>
+                                    <field name="font_weight"/>
+                                    <field name="text_align"/>
+                                    <field name="letter_spacing"/>
+                                    <field name="is_boxed"/>
+                                    <field name="box_count"/>
+                                    <field name="box_spacing"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cheque_layout_list" model="ir.ui.view">
+        <field name="name">cheque.layout.list</field>
+        <field name="model">cheque.layout</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="cheque_width_mm"/>
+                <field name="cheque_height_mm"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_cheque_layout" model="ir.actions.act_window">
+        <field name="name">Cheque Layouts</field>
+        <field name="res_model">cheque.layout</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_cheque_print_root" name="Cheque Printing"
+              parent="account.menu_finance" sequence="60"/>
+    <menuitem id="menu_cheque_layout" name="Cheque Layouts"
+              parent="menu_cheque_print_root" action="action_cheque_layout" sequence="10"/>
+</odoo>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_cheque_leaf_list" model="ir.ui.view">
+        <field name="name">cheque.leaf.list</field>
+        <field name="model">cheque.leaf</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'unused'"
+                  decoration-muted="state == 'used'"
+                  decoration-danger="state in ('voided', 'cancelled')">
+                <field name="number"/>
+                <field name="cheque_book_id"/>
+                <field name="state"/>
+                <field name="payee_name_snapshot"/>
+                <field name="amount_snapshot"/>
+                <field name="date_snapshot"/>
+                <field name="payment_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cheque_leaf_form" model="ir.ui.view">
+        <field name="name">cheque.leaf.form</field>
+        <field name="model">cheque.leaf</field>
+        <field name="arch" type="xml">
+            <form string="Cheque Leaf">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="unused,used,voided,cancelled"/>
+                    <button name="action_void" type="object" string="Void"
+                            invisible="state in ('voided', 'cancelled')"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="number"/>
+                        <field name="cheque_book_id"/>
+                        <field name="payment_id"/>
+                        <field name="void_reason" placeholder="e.g., Printed incorrectly, torn, etc." readonly="state in ('voided', 'cancelled')"/>
+                    </group>
+                    <group string="Printed Snapshot" invisible="state == 'unused'">
+                        <field name="payee_name_snapshot"/>
+                        <field name="amount_snapshot"/>
+                        <field name="date_snapshot"/>
+                        <field name="amount_words_snapshot"/>
+                        <field name="printed_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cheque_leaf" model="ir.actions.act_window">
+        <field name="name">Cheque Leaves</field>
+        <field name="res_model">cheque.leaf</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_cheque_book_form" model="ir.ui.view">
+        <field name="name">cheque.book.form</field>
+        <field name="model">cheque.book</field>
+        <field name="arch" type="xml">
+            <form string="Cheque Book">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="active,exhausted,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="action" name="%(action_cheque_leaf)d"
+                                icon="fa-list" context="{'search_default_cheque_book_id': id}">
+                            <field name="leaf_count" widget="statinfo" string="Leaves"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="partner_bank_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="layout_id"/>
+                        </group>
+                        <group>
+                            <field name="leaf_digit_length"/>
+                            <field name="leaf_from"/>
+                            <field name="total_leaves"/>
+                            <field name="leaf_to" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="unused_leaf_count" readonly="1"/>
+                        <field name="used_leaf_count" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cheque_book_list" model="ir.ui.view">
+        <field name="name">cheque.book.list</field>
+        <field name="model">cheque.book</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_bank_id"/>
+                <field name="leaf_from"/>
+                <field name="leaf_to"/>
+                <field name="unused_leaf_count"/>
+                <field name="used_leaf_count"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_cheque_print_bank" model="ir.actions.act_window">
+        <field name="name">Banks</field>
+        <field name="res_model">res.bank</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_cheque_book" model="ir.actions.act_window">
+        <field name="name">Cheque Books</field>
+        <field name="res_model">cheque.book</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_cheque_bank" name="Bank"
+              parent="menu_cheque_print_root" action="action_cheque_print_bank" sequence="30"/>
+    <menuitem id="menu_cheque_book" name="Cheque Books"
+              parent="menu_cheque_print_root" action="action_cheque_book" sequence="20"/>
+</odoo>
