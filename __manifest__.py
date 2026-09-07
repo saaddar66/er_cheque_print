@@ -1,6 +1,6 @@
 {
     'name': 'Cheque Printing',
-    'version': '1.0.0',
+    'version': '18.0.0.0.1',
     'category': 'Accounting/Accounting',
     'summary': 'Drag-and-drop cheque layout designer with leaf tracking, built for Pakistani banking conventions.',
     'description': """
