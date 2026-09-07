@@ -7,3 +7,6 @@ access_cheque_book_manager,cheque.book.manager,model_cheque_book,account.group_a
 access_cheque_leaf_user,cheque.leaf.user,model_cheque_leaf,base.group_user,1,1,1,0
 access_cheque_leaf_manager,cheque.leaf.manager,model_cheque_leaf,account.group_account_manager,1,1,1,1
 access_cheque_print_wizard_user,cheque.print.wizard.user,model_cheque_print_wizard,base.group_user,1,1,1,1
+access_hr_payslip_bulk_payment_user,hr.payslip.bulk.payment.user,model_hr_payslip_bulk_payment,base.group_user,1,1,1,1
+access_bulk_cheque_print_wizard,access.bulk.cheque.print.wizard,model_bulk_cheque_print_wizard,account.group_account_invoice,1,1,1,1
+access_jv_cheque_print_wizard_user,jv.cheque.print.wizard.user,model_jv_cheque_print_wizard,base.group_user,1,1,1,1

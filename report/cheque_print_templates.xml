@@ -2,118 +2,207 @@
 <odoo>
     <template id="cheque_print_document">
         <t t-call="web.html_container">
-            <style>
-            body.container, #wrapwrap, main {
-                margin: 0 !important;
-                padding: 0 !important;
-                max-width: none !important;
-                width: 100% !important;
-            }
-            </style>
             <t t-foreach="docs" t-as="doc">
-                    <t t-set="layout" t-value="doc.cheque_book_id.layout_id"/>
+
+                <!-- One cheque = one PDF page -->
+                <div
+                    class="page"
+                    style="
+                        page-break-inside: avoid;
+                        break-inside: avoid;
+                        margin: 0;
+                        padding: 0;
+                    ">
+
+                    <t t-set="layout"
+                    t-value="doc.cheque_book_id.layout_id"/>
 
                     <t t-set="date_digits"
-                       t-value="doc.date_snapshot.strftime('%d%m%Y') if doc.date_snapshot else ''"/>
+                    t-value="doc.date_snapshot.strftime('%d%m%Y') if doc.date_snapshot else ''"/>
+
                     <t t-set="date_display"
-                       t-value="doc.date_snapshot.strftime('%d/%m/%Y') if doc.date_snapshot else ''"/>
+                    t-value="doc.date_snapshot.strftime('%d/%m/%Y') if doc.date_snapshot else ''"/>
+
                     <t t-set="amount_figures_display"
-                       t-value="'{:,.0f}'.format(doc.amount_snapshot) if doc.amount_snapshot else '0'"/>
+                    t-value="'{:,.0f}'.format(doc.amount_snapshot) if doc.amount_snapshot else '0'"/>
+
                     <t t-set="currency_symbol"
-                       t-value="doc.currency_id.symbol if doc.currency_id else ''"/>
+                    t-value="doc.currency_id.symbol if doc.currency_id else ''"/>
 
                     <t t-set="all_words"
-                       t-value="(doc.amount_words_snapshot or '').split()"/>
-                    <t t-set="mid" t-value="len(all_words) // 2 if len(all_words) &gt; 6 else len(all_words)"/>
+                    t-value="(doc.amount_words_snapshot or '').split()"/>
+
+                    <t t-set="mid"
+                    t-value="len(all_words) // 2 if len(all_words) &gt; 6 else len(all_words)"/>
+
                     <t t-set="amount_words_line1"
-                       t-value="' '.join(all_words[:mid]) if all_words else ''"/>
+                    t-value="' '.join(all_words[:mid]) if all_words else ''"/>
+
                     <t t-set="amount_words_line2"
-                       t-value="' '.join(all_words[mid:]) if len(all_words) &gt; 6 else ''"/>
+                    t-value="' '.join(all_words[mid:]) if len(all_words) &gt; 6 else ''"/>
 
-                    <!-- Payee name split into two lines (for counter-foil use) -->
-                    <t t-set="payee_words"
-                       t-value="(doc.payee_name_snapshot or '').split()"/>
+                    <!-- Payee name split into two lines and truncated if too long -->
+                    <t t-set="p_name" t-value="doc.payee_name_snapshot or ''" />
+                    <t t-set="p_name_trunc" t-value="p_name if len(p_name) &lt;= 100 else p_name[:97] + '...'" />
+                    
+                    <t t-set="payee_words" t-value="p_name_trunc.split()"/>
                     <t t-set="payee_mid" t-value="len(payee_words) // 2 if len(payee_words) &gt; 1 else len(payee_words)"/>
-                    <t t-set="payee_name_line1"
-                       t-value="' '.join(payee_words[:payee_mid]) if payee_words else ''"/>
-                    <t t-set="payee_name_line2"
-                       t-value="' '.join(payee_words[payee_mid:]) if len(payee_words) &gt; 1 else ''"/>
+                    
+                    <t t-set="payee_name_line1" t-value="' '.join(payee_words[:payee_mid]) if payee_words else ''"/>
+                    <t t-set="payee_name_line2" t-value="' '.join(payee_words[payee_mid:]) if len(payee_words) &gt; 1 else ''"/>
 
-                    <div t-attf-style="position:relative; width:#{layout.cheque_width_mm}mm; height:#{layout.cheque_height_mm}mm; overflow:visible; font-family: Arial, sans-serif;">
-                        <!-- DEBUG: reference image overlay, remove before printing on real cheque stock -->
-                        <!-- <div t-if="layout.reference_image"
-                             t-attf-style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:-1;
-                                           background-image:url('#{image_data_uri(layout.reference_image)}');
-                                           background-size:100% 100%; background-repeat:no-repeat;"/> -->
+                    <!-- Cheque content -->
+                    <div
+                        t-attf-style="
+                            position: relative;
+                            width: #{layout.cheque_width_mm}mm;
+                            height: #{layout.cheque_height_mm}mm;
+                            overflow: visible;
+                            font-family: Arial, sans-serif;
+                        "
+                    >
 
-                        <!-- Debug: reference image for cheque finished-->     
                         <t t-foreach="layout.field_ids" t-as="f">
 
+                            <!-- Boxed Date -->
                             <t t-if="f.field_key == 'date' and f.is_boxed">
+
                                 <t t-foreach="range(f.box_count)" t-as="i">
-                                    <t t-set="box_left" t-value="f.pos_x + i * f.box_spacing"/>
-                                    <div t-attf-style="position:absolute; left:#{box_left}%; top:#{f.pos_y}%; font-size:#{f.font_size}px; font-weight:#{f.font_weight}; text-align:center; width:14px;">
-                                        <t t-esc="date_digits.ljust(f.box_count)[i:i + 1]"/>
+
+                                    <t t-set="box_left"
+                                    t-value="f.pos_x + i * f.box_spacing"/>
+
+                                    <div
+                                        t-attf-style="
+                                            position: absolute;
+                                            left: #{box_left}%;
+                                            top: #{f.pos_y}%;
+                                            font-size: #{f.font_size}px;
+                                            font-weight: #{f.font_weight};
+                                            text-align: center;
+                                            width: 14px;
+                                        "
+                                    >
+
+                                        <t t-esc="
+                                            date_digits
+                                            .ljust(f.box_count)
+                                            [i:i + 1]
+                                        "/>
+
                                     </div>
+
                                 </t>
+
                             </t>
 
+                            <!-- Normal Fields -->
                             <t t-else="">
-                                 <div t-attf-style="position:absolute; #{ 'right:' + str(round(100 - f.pos_x, 4)) + '%;' if f.text_align == 'right' else 'left:' + str(f.pos_x) + '%;' } top:#{f.pos_y}%; font-size:#{f.font_size}px; font-weight:#{f.font_weight}; letter-spacing:#{f.letter_spacing}px; text-align:#{f.text_align}; white-space:nowrap;">
 
-                                <t t-if="f.field_key == 'payee_name'">
-                                    <t t-esc="doc.payee_name_snapshot"/>
-                                </t>
-                                <t t-elif="f.field_key == 'payee_name_line1'">
-                                    <t t-esc="payee_name_line1"/>
-                                </t>
-                                <t t-elif="f.field_key == 'payee_name_line2'">
-                                    <t t-esc="payee_name_line2"/>
-                                </t>
-                                <t t-elif="f.field_key == 'amount_figures'">
-                                    <t t-esc="amount_figures_display"/>
-                                </t>
-                                <t t-elif="f.field_key == 'amount_words_line1'">
-                                    <t t-esc="amount_words_line1"/>
-                                </t>
-                                <t t-elif="f.field_key == 'amount_words_line2'">
-                                    <t t-esc="amount_words_line2"/>
-                                </t>
-                                <t t-elif="f.field_key == 'date'">
-                                    <t t-esc="date_display"/>
-                                </t>
-                                <t t-elif="f.field_key == 'account_title'">
-                                    <t t-esc="doc.payee_name_snapshot"/>
-                                </t>
-                                <t t-elif="f.field_key == 'cheque_number'">
-                                    <t t-esc="doc.number"/>
-                                </t>
-                                <t t-elif="f.field_key == 'memo'">
-                                    <t t-esc="doc.memo_snapshot"/>
-                                </t>
-                                <t t-elif="f.field_key == 'bank_name'">
-                                    <t t-esc="doc.bank_name"/>
-                                </t>
-                                <t t-elif="f.field_key == 'bank_account_number'">
-                                    <t t-esc="doc.bank_account_number"/>
-                                </t>
-                                <t t-elif="f.field_key == 'bank_email'">
-                                    <t t-esc="doc.bank_email"/>
-                                </t>
-                                <t t-elif="f.field_key == 'bank_address'">
-                                    <t t-esc="doc.bank_address"/>
-                                </t>
-                                <t t-elif="f.field_key == 'account_payee'">
-                                    <t t-if="doc.is_ac_payable_snapshot">
-                                        <span style="display:inline-block; border-top: 1px solid currentColor; border-bottom: 1px solid currentColor; padding-top: 3px; padding-bottom: 3px;">ACCOUNT PAYEE ONLY</span>
+                                <div
+                                    t-attf-style="
+                                        position: absolute;
+                                        #{'right:' + str(round(100 - f.pos_x, 4)) + '%;'
+                                        if f.text_align == 'right'
+                                        else 'left:' + str(f.pos_x) + '%;'}
+                                        top: #{f.pos_y}%;
+                                        font-size: #{f.font_size}px;
+                                        font-weight: #{f.font_weight};
+                                        letter-spacing: #{f.letter_spacing}px;
+                                        text-align: #{f.text_align};
+                                        white-space: nowrap;
+                                    "
+                                >
+
+                                    <t t-if="f.field_key == 'payee_name'">
+                                        <t t-esc="doc.payee_name_snapshot"/>
                                     </t>
-                                </t>
-                            </div>
+
+                                    <t t-elif="f.field_key == 'payee_name_line1'">
+                                        <t t-esc="payee_name_line1"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'payee_name_line2'">
+                                        <t t-esc="payee_name_line2"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'amount_figures'">
+                                        <t t-esc="amount_figures_display"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'amount_words_line1'">
+                                        <t t-esc="amount_words_line1"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'amount_words_line2'">
+                                        <t t-esc="amount_words_line2"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'date'">
+                                        <t t-esc="date_display"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'account_title'">
+                                        <t t-esc="doc.payee_name_snapshot"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'cheque_number'">
+                                        <t t-esc="doc.number"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'memo'">
+                                        <t t-esc="doc.memo_snapshot"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'bank_name'">
+                                        <t t-esc="doc.bank_name"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'bank_account_number'">
+                                        <t t-esc="doc.bank_account_number"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'bank_email'">
+                                        <t t-esc="doc.bank_email"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'bank_address'">
+                                        <t t-esc="doc.bank_address"/>
+                                    </t>
+
+                                    <t t-elif="f.field_key == 'account_payee'">
+
+                                        <t t-if="doc.is_ac_payable_snapshot">
+
+                                            <span
+                                                style="
+                                                    display: inline-block;
+                                                    border-top: 1px solid currentColor;
+                                                    border-bottom: 1px solid currentColor;
+                                                    padding-top: 3px;
+                                                    padding-bottom: 3px;
+                                                "
+                                            >
+                                                ACCOUNT PAYEE ONLY
+                                            </span>
+
+                                        </t>
+
+                                    </t>
+
+                                </div>
+
                             </t>
+
                         </t>
+
                     </div>
+
+                </div>
+
             </t>
-        </t>
+
+</t>
     </template>
 
     <record id="action_report_cheque_print" model="ir.actions.report">

@@ -10,7 +10,7 @@
                 </t>
             </div>
             <div class="o_cheque_designer_canvas position-relative border d-block"
-                 t-ref="canvas" style="width: 100%; overflow: visible;">
+                 t-ref="canvas" style="width: 100%; overflow: hidden;">
                 <img t-if="imageUrl" t-att-src="imageUrl"
                      style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:fill;"
                      draggable="false"/>

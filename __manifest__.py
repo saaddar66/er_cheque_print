@@ -15,13 +15,18 @@ printer. Includes:
 * Lakh/Crore amount-in-words conversion.
 * Cheque book and leaf tracking with an audit trail (unused/used/voided).
 """,
-    'depends': ['account'],
+    'depends': ['account', 'hr_payroll'],
     'data': [
         'security/ir.model.access.csv',
         'report/cheque_print_templates.xml',
         'views/cheque_layout_views.xml',
         'views/cheque_book_views.xml',
         'views/account_payment_views.xml',
+        'views/hr_payslip_views.xml',
+        'wizard/bulk_payment_wizard_views.xml',
+        'wizard/bulk_cheque_print_views.xml',
+        'wizard/jv_cheque_print_wizard_views.xml',
+        'views/account_move_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -32,4 +37,5 @@ printer. Includes:
     'installable': True,
     'application': False,
     'license': 'LGPL-3',
+    'author': 'Saad Dar',
 }

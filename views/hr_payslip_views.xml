@@ -1,0 +1,42 @@
+<odoo>
+
+    <record id="action_open_validate_payslip_journal_entries" model="ir.actions.server">
+
+        <field name="name">Confirm Selected Payslip Journal Entries</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code"> action = records.action_open_validate_journal_entries()</field>
+        <!-- <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/> -->
+    </record>
+
+
+    <!-- Bulk Register Payment Server Action -->
+    <record
+        id="action_open_hr_payslip_bulk_payment" model="ir.actions.server">
+        <field name="name">Bulk Register Payment</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Bulk Payslip Payment',
+            'res_model': 'hr.payslip.bulk.payment',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_payslip_ids': [(6, 0, records.ids)],
+            },
+        }
+        </field>
+
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
+
+    </record>
+
+
+
+</odoo>

@@ -71,16 +71,31 @@ class ChequePrintWizard(models.TransientModel):
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
+
         payment_id = self.env.context.get('default_payment_id')
-        if payment_id:
-            payment = self.env['account.payment'].browse(payment_id)
-            res.update({
-                'payee_name': payment.partner_id.name,
-                'amount': payment.amount,
-                'currency_id': payment.currency_id.id,
-                'cheque_date': payment.date or fields.Date.context_today(self),
-                'memo': payment.memo or '',
-            })
+        if not payment_id:
+            return res
+
+        payment = self.env['account.payment'].browse(payment_id).exists()
+        if not payment:
+            return res
+
+        # Sum all withholding amounts linked to this payment
+        withholding_total = sum(
+            self.env['account.payment.withholding.line'].search([
+                ('payment_id', '=', payment.id)
+            ]).mapped('amount')
+        )
+
+        res.update({
+            'payee_name': payment.partner_id.name,
+            'amount': round(payment.amount - withholding_total),
+            'currency_id': payment.currency_id.id,
+            'cheque_date': payment.date or fields.Date.context_today(self),
+            'memo': payment.memo or '',
+            'is_ac_payable': payment.get_cheque_ac_payable(fallback=True),
+        })
+
         return res
 
     @api.onchange('layout_id')
@@ -115,14 +130,9 @@ class ChequePrintWizard(models.TransientModel):
                     # Fallback string replacement if no Rupee currency exists in the system
                     amount_text = rec.currency_id.amount_to_text(rec.amount)
                     amount_text = amount_text.replace('Dollars', 'Rupees').replace('Dollar', 'Rupee')
-                    amount_text = amount_text.replace('Euros', 'Rupees').replace('Euro', 'Rupees')
-                    amount_text = amount_text.replace('Rupee', 'Rupees').replace('Rupees', 'Rupees')
+                    amount_text = amount_text.replace('Euros', 'Rupees').replace('Euro', 'Rupee')
                 else:
                     amount_text = ""
-
-                if amount_text and rec.amount != 1:
-                    amount_text = amount_text.replace('Rupee Only', 'Rupees Only')
-                    amount_text = amount_text.replace('Rupee', 'Rupees')
                 
                 # Append 'Only' if it's not already there
                 if amount_text and not amount_text.lower().endswith('only'):
@@ -136,6 +146,10 @@ class ChequePrintWizard(models.TransientModel):
         self.ensure_one()
         if not self.leaf_id:
             raise UserError("Please select a cheque number before printing.")
+
+        effective_is_ac_payable = self.payment_id.get_cheque_ac_payable(
+            fallback=self.is_ac_payable,
+        )
 
         # 1. Freeze all cheque data onto the leaf (snapshot) so the QWeb
         #    template reads from doc.<field>_snapshot — no data= dict needed.
@@ -156,13 +170,13 @@ class ChequePrintWizard(models.TransientModel):
             'bank_email': self.bank_email or '',
             'bank_address': self.bank_address or '',
             'memo_snapshot': self.memo or '',
-            'is_ac_payable_snapshot': self.is_ac_payable,
+            'is_ac_payable_snapshot': effective_is_ac_payable,
         })
 
         # 3. Write cheque leaf and A/C Payee flag back to the payment record
         self.payment_id.write({
             'cheque_leaf_id': self.leaf_id.id,
-            'is_ac_payable': self.is_ac_payable,
+            'is_ac_payable': effective_is_ac_payable,
         })
 
         # 4. Set paper format from the layout (if configured)

@@ -1,0 +1,92 @@
+<odoo>
+
+    <!-- Bulk Payslip Payment Wizard Form -->
+    <record id="view_hr_payslip_bulk_payment_form" model="ir.ui.view">
+        <field name="name">hr.payslip.bulk.payment.form</field>
+        <field name="model">hr.payslip.bulk.payment</field>
+        <field name="arch" type="xml">
+
+            <form string="Bulk Payslip Payment">
+
+                <sheet>
+
+                    <!-- Payment Details -->
+                    <group>
+                        <group>
+                            <field name="journal_id"/>
+                            <field name="payment_method_line_id"/>
+                            <field name="payment_date"/>
+                            <field name="x_cheque_maturity_date"/>
+                        </group>
+
+                        <group>
+                            <field name="cheque_start_number"/>
+                            <field name="cheque_end_number"/>
+                            <field name="other_particulars"/>
+                        </group>
+                    </group>
+
+                    <!-- Payment Summary -->
+                    <group string="Payment Summary">
+                        <field
+                            name="eligible_payslip_ids"
+                            widget="many2many_tags"
+                            readonly="1"
+                        />
+
+                        <field
+                            name="skipped_payslip_ids"
+                            widget="many2many_tags"
+                            readonly="1"
+                        />
+                    </group>
+
+                    <!-- Warning Message -->
+                    <div
+                        class="alert alert-warning"
+                        invisible="not skipped_payslip_ids"
+                    >
+                        Some selected payslips will be skipped because
+                        their journal entries are not posted.
+                    </div>
+
+                </sheet>
+
+                <!-- Wizard Footer -->
+                <footer>
+
+                    <button
+                        name="action_create_bulk_payments"
+                        string="Create Payments"
+                        type="object"
+                        class="btn-primary"
+                    />
+
+                    <button
+                        string="Cancel"
+                        special="cancel"
+                        class="btn-secondary"
+                    />
+
+                </footer>
+
+            </form>
+
+        </field>
+    </record>
+
+
+    <!-- Bulk Payslip Payment Wizard Action -->
+    <record id="action_hr_payslip_bulk_payment" model="ir.actions.act_window">
+
+        <field name="name">Bulk Payslip Payment</field>
+        <field name="res_model">hr.payslip.bulk.payment</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_hr_payslip_bulk_payment_form"/>
+        <field name="target">new</field>
+
+    </record>
+
+
+
+</odoo>

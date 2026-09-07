@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_jv_cheque_print_wizard_form" model="ir.ui.view">
+        <field name="name">jv.cheque.print.wizard.form</field>
+        <field name="model">jv.cheque.print.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Print Cheque">
+                <group>
+                    <group>
+                        <field name="move_id" invisible="1"/>
+                        <field name="layout_id"/>
+                        <field name="cheque_book_id"/>
+                        <field name="leaf_id"/>
+                    </group>
+                    <group>
+                        <field name="payee_name" readonly="1"/>
+                        <field name="amount" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="cheque_date"/>
+                        <field name="is_ac_payable"/>
+                    </group>
+                </group>
+                <group string="Additional Information">
+                    <field name="memo" readonly="1"/>
+                    <field name="amount_words" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_print" string="Print" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
