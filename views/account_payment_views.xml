@@ -10,7 +10,7 @@
                         string="Print Cheque"
                         type="object"
                         class="btn-primary"
-                        invisible="payment_type != 'outbound' or state != 'in_process'"/>
+                        invisible="payment_type != 'outbound'"/>
                 </xpath>
         </field>
     </record>

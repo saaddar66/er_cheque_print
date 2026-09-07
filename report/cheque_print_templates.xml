@@ -8,6 +8,8 @@
                 <div
                     class="page"
                     style="
+                        page-break-after: always;
+                        break-after: page;
                         page-break-inside: avoid;
                         break-inside: avoid;
                         margin: 0;
@@ -41,15 +43,18 @@
                     <t t-set="amount_words_line2"
                     t-value="' '.join(all_words[mid:]) if len(all_words) &gt; 6 else ''"/>
 
-                    <!-- Payee name split into two lines and truncated if too long -->
-                    <t t-set="p_name" t-value="doc.payee_name_snapshot or ''" />
-                    <t t-set="p_name_trunc" t-value="p_name if len(p_name) &lt;= 100 else p_name[:97] + '...'" />
-                    
-                    <t t-set="payee_words" t-value="p_name_trunc.split()"/>
-                    <t t-set="payee_mid" t-value="len(payee_words) // 2 if len(payee_words) &gt; 1 else len(payee_words)"/>
-                    
-                    <t t-set="payee_name_line1" t-value="' '.join(payee_words[:payee_mid]) if payee_words else ''"/>
-                    <t t-set="payee_name_line2" t-value="' '.join(payee_words[payee_mid:]) if len(payee_words) &gt; 1 else ''"/>
+                    <!-- Payee name split into two lines -->
+                    <t t-set="payee_words"
+                    t-value="(doc.payee_name_snapshot or '').split()"/>
+
+                    <t t-set="payee_mid"
+                    t-value="len(payee_words) // 2 if len(payee_words) &gt; 1 else len(payee_words)"/>
+
+                    <t t-set="payee_name_line1"
+                    t-value="' '.join(payee_words[:payee_mid]) if payee_words else ''"/>
+
+                    <t t-set="payee_name_line2"
+                    t-value="' '.join(payee_words[payee_mid:]) if len(payee_words) &gt; 1 else ''"/>
 
                     <!-- Cheque content -->
                     <div

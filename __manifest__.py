@@ -1,6 +1,6 @@
 {
     'name': 'Cheque Printing',
-    'version': '18.0.0.0.1',
+    'version': '1.0.0',
     'category': 'Accounting/Accounting',
     'summary': 'Drag-and-drop cheque layout designer with leaf tracking, built for Pakistani banking conventions.',
     'description': """
@@ -25,8 +25,6 @@ printer. Includes:
         'views/hr_payslip_views.xml',
         'wizard/bulk_payment_wizard_views.xml',
         'wizard/bulk_cheque_print_views.xml',
-        'wizard/jv_cheque_print_wizard_views.xml',
-        'views/account_move_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -37,5 +35,4 @@ printer. Includes:
     'installable': True,
     'application': False,
     'license': 'LGPL-3',
-    'author': 'Saad Dar',
 }

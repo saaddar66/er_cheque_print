@@ -91,7 +91,7 @@ class ChequePrintWizard(models.TransientModel):
             'payee_name': payment.partner_id.name,
             'amount': round(payment.amount - withholding_total),
             'currency_id': payment.currency_id.id,
-            'cheque_date': payment.date or fields.Date.context_today(self),
+            'cheque_date': payment.x_cheque_maturity_date or fields.Date.context_today(self),
             'memo': payment.memo or '',
             'is_ac_payable': payment.get_cheque_ac_payable(fallback=True),
         })
