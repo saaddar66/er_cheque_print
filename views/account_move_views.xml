@@ -7,11 +7,12 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
+                <field name="is_internal_transfer_journal" invisible="1"/>
                 <button name="action_open_jv_cheque_wizard" 
                         string="Print Cheque" 
                         type="object" 
                         class="oe_highlight" 
-                        invisible="state != 'posted' or move_type != 'entry'"/>
+                        invisible="state != 'posted' or move_type != 'entry' or not is_internal_transfer_journal"/>
             </xpath>
         </field>
     </record>
